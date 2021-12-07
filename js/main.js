@@ -1,8 +1,7 @@
 class Tx {
-    constructor(coinAddress, amount, action, timestamp, symbol) {
+    constructor(coinAddress, amount, timestamp, symbol) {
         this.coinAddress = coinAddress;
         this.amount = amount;
-        this.action = action;
         this.timestamp = timestamp;
         this.symbol = symbol;
     }
@@ -57,7 +56,7 @@ function getJSON(link) {
             return response.json();
         })
         .then(res => {
-            res.result.forEach(function (url, index) {
+            res.result.forEach((url, index) => {
                 let point = res.result[index];
                 let pointValue = point.value / Math.pow(10, 18);
                 let txFee = (point.gasUsed * point.gasPrice) / Math.pow(10, 18);
@@ -65,32 +64,34 @@ function getJSON(link) {
                 let a = "";
 
                 if (point.to == point.from) {
-                    a = 'inflow';
+                    a = "self";
                 } else if (point.to == walletUrl) {
-                    a = 'inflow';
-                    txFee = 0;
-                } else { a = 'outflow' }
+                    a = "inflow";
+                } else { a = "outflow" };
 
-                if (point.isError == 1) {
-                    pointValue = 0;
+                switch (a) {
+                    case "self":
+                        finalValue = pointValue - txFee;
+                        break;
+                    case "inflow":
+                        txFee = 0;
+                        finalValue = pointValue;
+                        break;
+                    case "outflow":
+                        finalValue = (pointValue + txFee) * (-1)
+                        break;
                 }
 
-                finalValue = pointValue + txFee;
-                if (finalValue < 0) {
-                    finalValue = finalValue * (-1)
-                    a = 'outflow'
-                }
 
-                let p = new Tx(
-                    'ethereum',
-                    finalValue,
-                    a,
-                    point.timeStamp,
-                    'ETH'
-                )
+                test = test + finalValue;
+                console.log(index, a, finalValue, "TEST TOTAL:", test);
 
-                txObjList.push(p);
+
+
+
+
             })
+            console.log(test);
             return res;
         })
 }
@@ -104,7 +105,6 @@ function getJSONtx(link) {
             res.result.forEach(function (url, index) {
                 let point = res.result[index];
                 let pointValue = point.value / Math.pow(10, Number(point.tokenDecimal));
-                let a = "";
 
                 coinAddresses[point.contractAddress] = 1;
 
@@ -112,16 +112,15 @@ function getJSONtx(link) {
 
                 if (point.from == point.to) {
                     return;
-                } else {
-                    if (point.to == walletUrl) {
-                        a = "inflow";
-                    } else { a = "outflow" };
-                };
+                }
+
+                if (point.from == walletUrl) {
+                    pointValue = pointValue * (-1);
+                }
 
                 let p = new Tx(
                     point.contractAddress,
                     pointValue,
-                    a,
                     point.timeStamp,
                     point.tokenSymbol,
                 )
@@ -133,16 +132,27 @@ function getJSONtx(link) {
         })
 }
 
+function getInternal(link) {
+    return fetch(`https://api.etherscan.io/api?module=account&action=txlistinternal&address=${link}&sort=desc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ`)
+        .then(response => {
+            return response.json();
+        })
+        .then(res => {
+            return res;
+        })
+}
+
 //-----------MAIN CALC FUNCTION HERE
 
 async function main(address) {
 
-    const ethPrice = await getEthPrice();
-
-    const normalTx = await getJSON(address);
-    console.log(normalTx);
-    const tokenTx = await getJSONtx(address);
-    console.log(tokenTx);
+    // const ethPrice = await getEthPrice();
+    // const normalTx = await getJSON(address);
+    // console.log(normalTx);
+    // const tokenTx = await getJSONtx(address);
+    // console.log(tokenTx);
+    const internalTx = await getInternal(address);
+    console.log(internalTx);
 
     //-----------SORT TX ALGORITHM
 
@@ -205,3 +215,6 @@ coinAddresses = {};
 
 transactions = [];
 txObjList = [];
+normalList = [];
+
+test = 0;
