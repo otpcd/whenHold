@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Document</title>
+</head>
+
+<body>
+
+
+
+    <script>
+
+        coinprices = {};
+        coinAddresses = {};
+
+        transactions = [];
+
+        function calculatePortfolio(obj) {
+            total = 0;
+            for (const property in obj) {
+                try {
+                    let y = property.toLowerCase();
+                    let x = portfolio[y];
+                    let value = coinprices[y].usd;
+                    total += value * x;
+                } catch (err) { };
+            }
+            return total;
+        }
+
+        function split10(obj) {
+            let split = [];
+            let result = [];
+            for (const property in obj) {
+                split.push(property);
+            }
+
+            while (split.length) {
+                result.push(split.splice(0, 10));
+            }
+            return result;
+        }
+
+        fetch('https://api.etherscan.io/api?module=account&action=tokentx&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=IJ8R2JP2RIWM7YBXQWDWUK8CRQSCVKDK94')
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (res) {
+
+                console.log(res);
+                transactions = res.result.reverse();
+                //transactions = transactions.slice(0, 20);
+
+                transactions.forEach(function (url, index) {
+                    coinAddresses[transactions[index].contractAddress] = 1;
+                })
+
+                let x = split10(coinAddresses);
+
+                x.forEach(function (url, index) {
+                    x[index] = x[index].join();
+                })
+
+                promises = [];
+
+                test = [];
+
+                // fetch('https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=' + cAdds0 + '&vs_currencies=usd')
+                //     .then(function (response) {
+                //         return response.json();
+                //     })
+
+                x.forEach(function (url, index) {
+                    let p =
+                        fetch('https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=' + x[index] + '&vs_currencies=usd');
+
+                    promises.push(p);
+
+                })
+
+                Promise.all(promises).then(values => {
+                    return Promise.all(values.map(r => r.json()));
+                }).then(values => {
+                    console.log(values);
+                    values.forEach(function (url, index) {
+                        coinprices = {
+                            ...coinprices,
+                            ...values[index]
+                        }
+                    })
+                })
+
+            })
+
+
+    </script>
+</body>
+
+</html>

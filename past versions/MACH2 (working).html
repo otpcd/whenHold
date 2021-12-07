@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Document</title>
+</head>
+
+<body>
+
+
+
+    <script>
+
+        class Tx {
+            constructor(coinAddress, amount, action, timestamp, symbol) {
+                this.coinAddress = coinAddress;
+                this.amount = amount;
+                this.action = action;
+                this.timestamp = timestamp;
+                this.symbol = symbol;
+            }
+        }
+
+        walletUrl = "0x299a0fAF372A6b685a4e8339722f4a5fDC518724";
+        walletUrl = walletUrl.toLowerCase();
+
+        currentPortfolio = {
+            coins: {},
+            timestamp: 0,
+            value: 0
+        };
+
+        maxPortfolio = {
+            coins: {},
+            timestamp: 0,
+            value: 0
+        };
+
+        coinprices = {};
+        coinSymbols = {};
+        coinAddresses = {};
+
+        transactions = [];
+        txObjList = [];
+
+        function calculatePortfolio(obj) {
+            total = 0;
+            for (const property in obj.coins) {
+                try {
+                    let price = coinprices[property].usd;
+                    total += (price * obj.coins[property]);
+                } catch (err) {
+                    delete obj.coins[property];
+                };
+            }
+            return total;
+        }
+
+        function split10(obj) {
+            let split = [];
+            let result = [];
+            for (const property in obj) {
+                split.push(property);
+            }
+
+            while (split.length) {
+                result.push(split.splice(0, 10));
+            }
+            return result;
+        }
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        fetch('https://api.etherscan.io/api?module=account&action=tokentx&address=' + walletUrl + '&sort=desc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ')
+            .then(function (response) {
+                return response.json()
+            })
+            .then(function (res) {
+
+                console.log(res);
+                transactions = res.result.reverse();
+                //transactions = transactions.slice(0, 20);
+
+                transactions.forEach(function (url, index) {
+                    let point = transactions[index];
+                    let pointDecimal = point.value / Math.pow(10, Number(point.tokenDecimal));
+                    let a = "";
+
+                    coinAddresses[point.contractAddress] = 1;
+
+                    coinSymbols[point.contractAddress] = point.tokenSymbol;
+
+                    if (point.from == point.to) {
+                        return;
+                    } else {
+                        if (point.to == walletUrl) {
+                            a = "inflow";
+                        } else { a = "outflow" };
+                    };
+
+                    let p = new Tx(
+                        point.contractAddress,
+                        pointDecimal,
+                        a,
+                        point.timeStamp,
+                        point.tokenSymbol
+                    )
+
+                    txObjList.push(p);
+                })
+
+                let x = split10(coinAddresses);
+
+                x.forEach(function (url, index) {
+                    x[index] = x[index].join();
+                })
+
+                promises = [];
+
+                x.forEach(function (url, index) {
+                    let p =
+                        fetch('https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=' + x[index] + '&vs_currencies=usd');
+
+                    promises.push(p);
+
+                })
+
+                Promise.all(promises).then(values => {
+                    return Promise.all(values.map(r => r.json()));
+                }).then(values => {
+                    console.log(values);
+                    values.forEach(function (url, index) {
+                        coinprices = {
+                            ...coinprices,
+                            ...values[index]
+                        }
+                    })
+                })
+
+                setTimeout(() => {
+                    txObjList.forEach(function (url, index) {
+                        let p = txObjList[index];
+                        currentPortfolio.timestamp = p.timestamp;
+
+                        if (currentPortfolio.coins[p.coinAddress] == undefined) {
+                            //add coin to portfolio
+                            currentPortfolio.coins[p.coinAddress] = p.amount;
+                            console.log("Adding: ", p.symbol, " Amount: ", p.amount);
+                        } else {
+                            //check if inflow or outflow
+                            //increment/decrement value from currentP object
+                            if (p.action == "inflow") {
+                                currentPortfolio.coins[p.coinAddress] = currentPortfolio.coins[p.coinAddress] + p.amount;
+
+                                console.log("-> INFLOW: ", p.symbol, " Amount: ", p.amount)
+                                console.log("Current ", p.symbol, " holdings: ", currentPortfolio.coins[p.coinAddress])
+                            } else {
+                                currentPortfolio.coins[p.coinAddress] = currentPortfolio.coins[p.coinAddress] - p.amount;
+
+                                console.log("<- OUTFLOW: ", p.symbol, " Amount: ", p.amount)
+                                console.log("Current ", p.symbol, " holdings: ", currentPortfolio.coins[p.coinAddress])
+
+                                if (currentPortfolio.coins[p.coinAddress] <= 1e-10) {
+                                    delete currentPortfolio.coins[p.coinAddress];
+                                }
+                            }
+                        }
+
+                        console.log(calculatePortfolio(currentPortfolio));
+                        currentPortfolio.value = calculatePortfolio(currentPortfolio);
+
+                        if (currentPortfolio.value > maxPortfolio.value) {
+
+                            maxPortfolio = _.cloneDeep(currentPortfolio);
+
+                            console.log("New max portfolio: ",
+                                maxPortfolio.value,
+                                " Timestamp: ", maxPortfolio.timestamp);
+
+                            for (const property in maxPortfolio.coins) {
+                                console.log(property)
+                            }
+                        }
+
+                    });
+                }, 3000);
+
+                setTimeout(() => {
+
+                    const finalTime = new Date(maxPortfolio.timestamp * 1000);
+
+                    var value1 = numberWithCommas(maxPortfolio.value.toFixed(2));
+                    const finalValue = "$" + value1
+
+                    console.log("You should have held on " + finalTime);
+                    console.log("Your portfolio would be worth " + finalValue + " today.")
+
+                    for (const property in maxPortfolio.coins) {
+                        let sym = coinSymbols[property];
+                        console.log(sym, ": ", maxPortfolio.coins[property]);
+                    }
+
+
+                }, 4000);
+
+
+            })
+
+
+    </script>
+
+    <script src="lodash.js"></script>
+</body>
+
+</html>
