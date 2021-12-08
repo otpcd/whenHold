@@ -45,6 +45,40 @@ function reset() {
     coinAddresses = {};
 }
 
+function createTable(obj) {
+    var html = "";
+
+    for (const property in obj.coins) {
+        let symbol = coinSymbols[property];
+
+        let amount = obj.coins[property];
+
+        let price = coinprices[property].usd;
+        let pValue = (amount * price);
+
+        price = price.toString();
+        price = "$" + price;
+
+        pValue = pValue.toFixed(2);
+        pValue = "$" + numberWithCommas(pValue);
+
+        if (amount % 1 != 0) {
+            amount = amount.toFixed(3);
+        }
+        amount = numberWithCommas(amount);
+
+        html = html +
+            "<tr><td>" + symbol +
+            "</td><td>" + amount +
+            "</td><td>" + price +
+            "</td><td>" + pValue +
+            "</td></tr>";
+    }
+
+    return html;
+
+}
+
 function calculatePortfolio(obj) {
     total = 0;
     for (const property in obj.coins) {

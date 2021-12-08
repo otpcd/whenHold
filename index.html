@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>whenHold</title>
     <link rel="stylesheet" href="css/style.css">
-    <script type="text/javascript" src="js/main.js">
-    </script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -30,10 +30,10 @@
         <p align="center" class="answer"></p>
     </div>
 
-    <div class="portfolio">
+    <div>
+        <table class="portfolio" id="p-table">
 
-
-
+        </table>
     </div>
 
 
@@ -45,9 +45,12 @@
             var urlNode = document.querySelector(".center-block-input");
             var firstLineNode = document.querySelectorAll(".answer")[0];
             var secondLineNode = document.querySelectorAll(".answer")[1];
+            var tableNode = document.getElementById("p-table");
 
             walletUrl = urlNode.value;
             walletUrl = walletUrl.toLowerCase();
+
+            firstLineNode.innerHTML = "Calculating...";
 
             try {
                 await main(walletUrl);
@@ -66,7 +69,7 @@
             firstLineNode.style.color = 'black';
             secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today.";
 
-
+            tableNode.innerHTML = createTable(maxPortfolio);
 
             reset();
 
