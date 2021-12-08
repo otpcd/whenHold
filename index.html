@@ -6,20 +6,48 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>whenHold</title>
-    <script type="text/javascript" src="js/main.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="js/main.js">
+    </script>
 </head>
 
 <body>
 
-    <input type="text" class="addressInput">
+    <h1 align="center" class="header">When Should <b>YOU</b> Have Held?</h1>
+
+    <div>
+        <input type="text" class="center-block-input" style="width: 60%">
+        <button class="center-block-btn" onClick="go()" spellcheck="false">Let's find out</button>
+    </div>
+
+    <div>
+        <p align="center" class="answer"></p>
+        <p align="center" class="answer"></p>
+    </div>
 
 
     <script>
 
-        walletUrl = "0xe4b068bcc4e7e17e156c3b129f19a84c030484b0";
-        walletUrl = walletUrl.toLowerCase();
+        walletUrl = "";
 
-        main(walletUrl)
+        async function go() {
+            var urlNode = document.querySelector(".center-block-input");
+            var firstLineNode = document.querySelectorAll(".answer")[0];
+            var secondLineNode = document.querySelectorAll(".answer")[1];
+
+            walletUrl = urlNode.value;
+            walletUrl = walletUrl.toLowerCase();
+            await main(walletUrl);
+
+            const finalTime = new Date(maxPortfolio.timestamp * 1000);
+            var value1 = numberWithCommas(maxPortfolio.value.toFixed(2));
+            const finalValue = "$" + value1;
+
+            firstLineNode.innerHTML = "You should have held on " + finalTime;
+            secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today."
+
+            reset();
+        }
 
     </script>
 

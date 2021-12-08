@@ -14,7 +14,6 @@ coinprices = {};
 coinSymbols = {};
 coinAddresses = {};
 
-transactions = [];
 txObjList = [];
 
 class Tx {
@@ -24,6 +23,26 @@ class Tx {
         this.timestamp = timestamp;
         this.symbol = symbol;
     }
+}
+
+function reset() {
+    maxPortfolio = {
+        coins: {},
+        timestamp: 0,
+        value: 0
+    };
+
+    currentPortfolio = {
+        coins: {},
+        timestamp: 0,
+        value: 0
+    };
+
+    txObjList = [];
+
+    coinprices = {};
+    coinSymbols = {};
+    coinAddresses = {};
 }
 
 function calculatePortfolio(obj) {
@@ -109,6 +128,8 @@ function getJSONtx(link) {
 //-----------MAIN CALC FUNCTION HERE
 
 async function main(address) {
+
+    txObjList = [];
 
     const tokenTx = await getJSONtx(address);
 
