@@ -1,3 +1,22 @@
+currentPortfolio = {
+    coins: {},
+    timestamp: 0,
+    value: 0
+};
+
+maxPortfolio = {
+    coins: {},
+    timestamp: 0,
+    value: 0
+};
+
+coinprices = {};
+coinSymbols = {};
+coinAddresses = {};
+
+transactions = [];
+txObjList = [];
+
 class Tx {
     constructor(coinAddress, amount, timestamp, symbol) {
         this.coinAddress = coinAddress;
@@ -50,52 +69,6 @@ function getEthPrice() {
         })
 }
 
-function getJSON(link) {
-    return fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${link}&sort=asc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ`)
-        .then(response => {
-            return response.json();
-        })
-        .then(res => {
-            res.result.forEach((url, index) => {
-                let point = res.result[index];
-                let pointValue = point.value / Math.pow(10, 18);
-                let txFee = (point.gasUsed * point.gasPrice) / Math.pow(10, 18);
-                let finalValue = 0;
-                let a = "";
-
-                if (point.to == point.from) {
-                    a = "self";
-                } else if (point.to == walletUrl) {
-                    a = "inflow";
-                } else { a = "outflow" };
-
-                switch (a) {
-                    case "self":
-                        finalValue = pointValue - txFee;
-                        break;
-                    case "inflow":
-                        txFee = 0;
-                        finalValue = pointValue;
-                        break;
-                    case "outflow":
-                        finalValue = (pointValue + txFee) * (-1)
-                        break;
-                }
-
-
-                test = test + finalValue;
-                console.log(index, a, finalValue, "TEST TOTAL:", test);
-
-
-
-
-
-            })
-            console.log(test);
-            return res;
-        })
-}
-
 function getJSONtx(link) {
     return fetch(`https://api.etherscan.io/api?module=account&action=tokentx&address=${link}&sort=asc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ`)
         .then(response => {
@@ -132,89 +105,108 @@ function getJSONtx(link) {
         })
 }
 
-function getInternal(link) {
-    return fetch(`https://api.etherscan.io/api?module=account&action=txlistinternal&address=${link}&sort=desc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ`)
-        .then(response => {
-            return response.json();
-        })
-        .then(res => {
-            return res;
-        })
-}
 
 //-----------MAIN CALC FUNCTION HERE
 
 async function main(address) {
 
-    // const ethPrice = await getEthPrice();
-    // const normalTx = await getJSON(address);
-    // console.log(normalTx);
-    // const tokenTx = await getJSONtx(address);
-    // console.log(tokenTx);
-    const internalTx = await getInternal(address);
-    console.log(internalTx);
+    const tokenTx = await getJSONtx(address);
 
-    //-----------SORT TX ALGORITHM
+    let x = split10(coinAddresses);
 
-    // txObjList.sort((a, b) => {
-    //     var keyA = a.timestamp;
-    //     var keyB = b.timestamp;
-    //     if (keyA < keyB) return -1;
-    //     if (keyA > keyB) return 1;
-    //     return 0;
-    // })
+    x.forEach(function (url, index) {
+        x[index] = x[index].join();
+    })
 
-    //-----------SORT TX ALGORITHM
+    promises = [];
 
-    //ORDER PORTFOLIO
+    x.forEach(function (url, index) {
+        let p =
+            fetch('https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=' + x[index] + '&vs_currencies=usd');
 
-    // let response = await fetch(normalTx).then(response => {
-    //     return response.json()
-    // }).then(res => {
-    //     console.log(res.result);
-    // })
+        promises.push(p);
 
-    // if (response.ok) { // if HTTP-status is 200-299
-    //     var json = await response.json();
-    // } else {
-    //     console.error("HTTP-Error: " + response.status);
-    // }
+    })
 
-    // let erc20Tx = `https://api.etherscan.io/api?module=account&action=tokentx&address=${address}&sort=asc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ`;
-    // let response2 = await fetch(erc20Tx);
+    await Promise.all(promises).then(values => {
+        return Promise.all(values.map(r => r.json()));
+    }).then(values => {
+        console.log(values);
+        values.forEach(function (url, index) {
+            coinprices = {
+                ...coinprices,
+                ...values[index]
+            }
+        })
+        console.log("Promises complete");
+    })
 
-    // if (response2.ok) { // if HTTP-status is 200-299
-    //     var json2 = await response2.json();
-    // } else {
-    //     console.error("HTTP-Error: " + response.status);
-    // }
+    txObjList.forEach(function (url, index) {
+        let p = txObjList[index];
+        currentPortfolio.timestamp = p.timestamp;
 
-    //console.log(json2);
+        if (currentPortfolio.coins[p.coinAddress] == undefined) {
+            //add coin to portfolio
+            currentPortfolio.coins[p.coinAddress] = p.amount;
+            console.log("Adding: ", p.symbol, " Amount: ", p.amount);
+            console.log("...");
+        } else {
+            //check if inflow or outflow
+            //increment/decrement value from currentP object
+            if (p.amount > 0) {
+                currentPortfolio.coins[p.coinAddress] = currentPortfolio.coins[p.coinAddress] + p.amount;
 
+                console.log("-> INFLOW: ", p.symbol, " Amount: ", p.amount)
+                console.log("Current ", p.symbol, " holdings: ", currentPortfolio.coins[p.coinAddress])
+                console.log("...")
 
+            } else {
+                let rev = p.amount;
+                rev = rev * (-1);
+
+                currentPortfolio.coins[p.coinAddress] = currentPortfolio.coins[p.coinAddress] - rev;
+
+                console.log("<- OUTFLOW: ", p.symbol, " Amount: ", rev)
+                console.log("Current ", p.symbol, " holdings: ", currentPortfolio.coins[p.coinAddress])
+                console.log("...")
+
+                if (currentPortfolio.coins[p.coinAddress] <= 1e-10) {
+                    delete currentPortfolio.coins[p.coinAddress];
+                }
+            }
+        }
+
+        //console.log(calculatePortfolio(currentPortfolio));
+        currentPortfolio.value = calculatePortfolio(currentPortfolio);
+
+        if (currentPortfolio.value > maxPortfolio.value) {
+
+            maxPortfolio = _.cloneDeep(currentPortfolio);
+
+            console.log("New max portfolio: ",
+                maxPortfolio.value,
+                " Timestamp: ", maxPortfolio.timestamp);
+
+            for (const property in maxPortfolio.coins) {
+                console.log(coinSymbols[property], ": ", maxPortfolio.coins[property]);
+            }
+
+            console.log("...")
+        }
+
+    });
+
+    const finalTime = new Date(maxPortfolio.timestamp * 1000);
+
+    var value1 = numberWithCommas(maxPortfolio.value.toFixed(2));
+    const finalValue = "$" + value1
+
+    console.log("You should have held on " + finalTime);
+    console.log("Your portfolio would be worth " + finalValue + " today.")
+
+    for (const property in maxPortfolio.coins) {
+        let sym = coinSymbols[property];
+        console.log(sym, ": ", maxPortfolio.coins[property]);
+    }
 
 }
-
-//-----------MAIN CALC FUNCTION HERE
-
-currentPortfolio = {
-    coins: {},
-    timestamp: 0,
-    value: 0
-};
-
-maxPortfolio = {
-    coins: {},
-    timestamp: 0,
-    value: 0
-};
-
-coinprices = {};
-coinSymbols = {};
-coinAddresses = {};
-
-transactions = [];
-txObjList = [];
-normalList = [];
-
-test = 0;
