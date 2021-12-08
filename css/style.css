@@ -8,6 +8,9 @@ body {
 
 .header {
     font-family:Arial, Helvetica, sans-serif;
+    margin: auto;
+    width: 50%;
+    text-align: center;
 }
 
 .center-block {

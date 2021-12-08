@@ -13,16 +13,27 @@
 
 <body>
 
-    <h1 align="center" class="header">When Should <b>YOU</b> Have Held?</h1>
+    <p style="font-size: 10px; font-family:monospace">https://github.com/otpcd/whenHold</p>
+
+    <div class="header">
+        <h1>When Should You Have Held?</h1>
+        <p><small>Only applies to ERC20 token holdings*</small></p>
+    </div>
 
     <div>
-        <input type="text" class="center-block-input" style="width: 60%">
+        <input type="text" class="center-block-input" style="width: 60%" placeholder="Enter an ERC-20 wallet address">
         <button class="center-block-btn" onClick="go()" spellcheck="false">Let's find out</button>
     </div>
 
     <div>
         <p align="center" class="answer"></p>
         <p align="center" class="answer"></p>
+    </div>
+
+    <div class="portfolio">
+
+
+
     </div>
 
 
@@ -37,16 +48,28 @@
 
             walletUrl = urlNode.value;
             walletUrl = walletUrl.toLowerCase();
-            await main(walletUrl);
+
+            try {
+                await main(walletUrl);
+            } catch (err) {
+                firstLineNode.innerHTML = "<b>ERROR</b>";
+                firstLineNode.style.color = 'red';
+                secondLineNode.innerHTML = "";
+                return;
+            }
 
             const finalTime = new Date(maxPortfolio.timestamp * 1000);
             var value1 = numberWithCommas(maxPortfolio.value.toFixed(2));
             const finalValue = "$" + value1;
 
             firstLineNode.innerHTML = "You should have held on " + finalTime;
-            secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today."
+            firstLineNode.style.color = 'black';
+            secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today.";
+
+
 
             reset();
+
         }
 
     </script>
