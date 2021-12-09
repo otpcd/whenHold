@@ -65,9 +65,19 @@
             var value1 = numberWithCommas(maxPortfolio.value.toFixed(2));
             const finalValue = "$" + value1;
 
-            firstLineNode.innerHTML = "You should have held on " + finalTime;
-            firstLineNode.style.color = 'black';
-            secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today.";
+            if (currentPortfolio != maxPortfolio) {
+
+                firstLineNode.style.color = 'black';
+                firstLineNode.innerHTML = "You should have held on " + finalTime;
+                secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today.";
+
+            } else {
+
+                firstLineNode.style.color = 'black';
+                firstLineNode.innerHTML = "Congratulations! You held at the exact right time.";
+                secondLineNode.innerHTML = "Your portfolio is worth " + finalValue + " today.";
+
+            }
 
             let finalTable = orderPortfolio(maxPortfolio.coins);
             console.log(finalTable);
