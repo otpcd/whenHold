@@ -45,35 +45,40 @@ function reset() {
     coinAddresses = {};
 }
 
-function createTable(obj) {
-    var html = "";
+function createTable(arr) {
+    var html = "<tr><td>" + "<b>COIN</b>" +
+        "</td><td>" + "<b>HOLDINGS</b>" +
+        "</td><td>" + "<b>CURRENT PRICE</b>" +
+        "</td><td>" + "<b>VALUE TODAY</b>" +
+        "</td></tr>";
 
-    for (const property in obj.coins) {
-        let symbol = coinSymbols[property];
+    arr.forEach((url, index) => {
+        let s = arr[index].symbol;
 
-        let amount = obj.coins[property];
+        let a = arr[index].amount;
 
-        let price = coinprices[property].usd;
-        let pValue = (amount * price);
+        let p = arr[index].price;
+        let pV = (a * p);
 
-        price = price.toString();
-        price = "$" + price;
+        p = p.toString();
+        p = "$" + p;
 
-        pValue = pValue.toFixed(2);
-        pValue = "$" + numberWithCommas(pValue);
+        pV = pV.toFixed(2);
+        pV = "$" + numberWithCommas(pV);
 
-        if (amount % 1 != 0) {
-            amount = amount.toFixed(3);
+        if (a % 1 != 0) {
+            a = a.toFixed(3);
         }
-        amount = numberWithCommas(amount);
+        a = numberWithCommas(a);
 
         html = html +
-            "<tr><td>" + symbol +
-            "</td><td>" + amount +
-            "</td><td>" + price +
-            "</td><td>" + pValue +
+            "<tr><td>" + s +
+            "</td><td>" + a +
+            "</td><td>" + p +
+            "</td><td>" + pV +
             "</td></tr>";
-    }
+    })
+
 
     return html;
 
@@ -98,6 +103,8 @@ function orderPortfolio(obj) {
         tableArray.push(o);
     }
 
+    sortTable(tableArray);
+    return tableArray;
 
 
 }
@@ -106,11 +113,10 @@ function sortTable(arr) {
     arr.sort((a, b) => {
         var valueA = a.value;
         var valueB = b.value;
-        if (valueA < valueB) return -1;
-        if (valueA > valueB) return 1;
+        if (valueA < valueB) return 1;
+        if (valueA > valueB) return -1;
         return 0;
     })
-    console.log(tableArray);
 }
 
 function calculatePortfolio(obj) {
@@ -142,8 +148,6 @@ function split10(obj) {
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
-
 
 function getEthPrice() {
     return fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')

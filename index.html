@@ -69,9 +69,10 @@
             firstLineNode.style.color = 'black';
             secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today.";
 
-            tableNode.innerHTML = createTable(maxPortfolio);
+            let finalTable = orderPortfolio(maxPortfolio.coins);
+            console.log(finalTable);
 
-            orderPortfolio(maxPortfolio.coins);
+            tableNode.innerHTML = createTable(finalTable);
 
             reset();
 
