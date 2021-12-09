@@ -6,6 +6,13 @@ table, td, tr {
     border: 1px solid black;
 }
 
+#counter {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+
+}
+
 .portfolio {
     margin-left:auto;
     margin-right:auto;
