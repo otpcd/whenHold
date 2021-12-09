@@ -36,6 +36,12 @@
         </table>
     </div>
 
+    <div>
+
+        <p align="center" class="final"></p>
+
+    </div>
+
 
     <script>
 
@@ -45,11 +51,13 @@
             var urlNode = document.querySelector(".center-block-input");
             var firstLineNode = document.querySelectorAll(".answer")[0];
             var secondLineNode = document.querySelectorAll(".answer")[1];
+            var finalLineNode = document.querySelector(".final");
             var tableNode = document.getElementById("p-table");
 
             walletUrl = urlNode.value;
             walletUrl = walletUrl.toLowerCase();
 
+            firstLineNode.style.color = 'black';
             firstLineNode.innerHTML = "Calculating...";
 
             try {
@@ -63,13 +71,19 @@
 
             const finalTime = new Date(maxPortfolio.timestamp * 1000);
             var value1 = numberWithCommas(maxPortfolio.value.toFixed(2));
+            var value2 = numberWithCommas(currentPortfolio.value.toFixed(2));
             const finalValue = "$" + value1;
+
+            var percentDiff = ((maxPortfolio.value - currentPortfolio.value) / currentPortfolio.value) * 100;
+            percentDiff = percentDiff.toFixed(2);
+
 
             if (currentPortfolio != maxPortfolio) {
 
                 firstLineNode.style.color = 'black';
-                firstLineNode.innerHTML = "You should have held on " + finalTime;
-                secondLineNode.innerHTML = "Your portfolio would be worth " + finalValue + " today.";
+                firstLineNode.innerHTML = "You should have held on <b>" + finalTime + "</b>";
+                secondLineNode.innerHTML = "Your portfolio would be worth <b>" + finalValue + "</b> today.";
+                finalLineNode.innerHTML = "That's <b>" + percentDiff + "%</b> more than you currently have."
 
             } else {
 
