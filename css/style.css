@@ -2,6 +2,10 @@ body {
     background-color:blanchedalmond;
 }
 
+table, td, tr {
+    border: 1px solid black;
+}
+
 .portfolio {
     margin-left:auto;
     margin-right:auto;

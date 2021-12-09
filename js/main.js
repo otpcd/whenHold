@@ -79,6 +79,40 @@ function createTable(obj) {
 
 }
 
+function orderPortfolio(obj) {
+
+    tableArray = [];
+
+    for (const property in obj) {
+        let o = {};
+        let sym = coinSymbols[property];
+        let amt = obj[property];
+        let cPrice = coinprices[property].usd;
+        let val = amt * cPrice;
+
+        o.symbol = sym;
+        o.amount = amt;
+        o.price = cPrice;
+        o.value = val;
+
+        tableArray.push(o);
+    }
+
+
+
+}
+
+function sortTable(arr) {
+    arr.sort((a, b) => {
+        var valueA = a.value;
+        var valueB = b.value;
+        if (valueA < valueB) return -1;
+        if (valueA > valueB) return 1;
+        return 0;
+    })
+    console.log(tableArray);
+}
+
 function calculatePortfolio(obj) {
     total = 0;
     for (const property in obj.coins) {
@@ -206,8 +240,7 @@ async function main(address) {
             console.log("Adding: ", p.symbol, " Amount: ", p.amount);
             console.log("...");
         } else {
-            //check if inflow or outflow
-            //increment/decrement value from currentP object
+            //increment/decrement value
             if (p.amount > 0) {
                 currentPortfolio.coins[p.coinAddress] = currentPortfolio.coins[p.coinAddress] + p.amount;
 
