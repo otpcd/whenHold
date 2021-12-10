@@ -3,6 +3,8 @@
 
 <head>
 
+    <script type="text/javascript" src="test.js"></script>
+
 </head>
 
 <body>
@@ -13,23 +15,57 @@
 
     <script>
 
+        url = 'https://api.etherscan.io/api?module=account&action=txlistinternal&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ';
 
+        url2 = 'https://api.etherscan.io/api?module=account&action=txlist&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ';
 
-        fetch('https://api.etherscan.io/api?module=account&action=txlist&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ')
-            .then(function (response) {
-                return response.json()
-            })
-            .then(function (res) {
-                console.log(res);
-            })
+        normalTx = [];
+        internalTx = [];
+        hashList = [];
+        total = 0
 
-        fetch('https://api.etherscan.io/api?module=account&action=tokentx&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=asc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ')
-            .then(function (response) {
-                return response.json()
+        function findTx(array, blockNo) {
+            array.forEach((url, index) => {
+                if (array[index].blockNumber == blockNo) {
+                    console.log(array[index]);
+                }
             })
-            .then(function (res) {
-                console.log(res);
-            })
+        }
+
+        function getInternalTx() {
+            return fetch(url)
+                .then(response => {
+                    return response.json();
+                })
+                .then(res => {
+                    console.log(res.result);
+                    internalTx = res.result;
+                    internalTx.forEach((url, index) => {
+                        let amt = internalTx[index].value
+                        amt = amt / Math.pow(10, 18);
+                        total += amt;
+                    })
+                    console.log(total);
+                })
+        }
+
+        function getNormalTx() {
+            return fetch(url2)
+                .then(response => {
+                    return response.json();
+                })
+                .then(res => {
+                    console.log(res.result);
+                    normalTx = res.result;
+                })
+        }
+
+        async function go() {
+            await getInternalTx();
+            await getNormalTx();
+        }
+
+        go();
 
     </script>
 </body>

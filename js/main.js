@@ -160,7 +160,7 @@ function getEthPrice() {
         })
 }
 
-function getJSONtx(link) {
+function getTokenTx(link) {
     return fetch(`https://api.etherscan.io/api?module=account&action=tokentx&address=${link}&sort=asc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ`)
         .then(response => {
             return response.json();
@@ -203,7 +203,7 @@ async function main(address) {
 
     txObjList = [];
 
-    const tokenTx = await getJSONtx(address);
+    const tokenTx = await getTokenTx(address);
 
     let x = split10(coinAddresses);
 
