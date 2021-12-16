@@ -16,6 +16,8 @@ coinAddresses = {};
 
 txObjList = [];
 
+bsc = false;
+
 class Tx {
     constructor(coinAddress, amount, timestamp, symbol) {
         this.coinAddress = coinAddress;
@@ -161,7 +163,16 @@ function getEthPrice() {
 }
 
 function getTokenTx(link) {
-    return fetch(`https://api.etherscan.io/api?module=account&action=tokentx&address=${link}&sort=asc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ`)
+    let scanner = "";
+    let apiKey = "";
+    if (bsc == false) {
+        scanner = "etherscan.io";
+        apiKey = "744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ"
+    } else {
+        scanner = "bscscan.com";
+        apiKey = "DEJRY487FBI9T81GH6Q4DN3RAM8C2WY7RB"
+    }
+    return fetch(`https://api.${scanner}/api?module=account&action=tokentx&address=${link}&sort=asc&apikey=${apiKey}`)
         .then(response => {
             return response.json();
         })
@@ -199,7 +210,7 @@ function getTokenTx(link) {
 
 //-----------MAIN CALC FUNCTION HERE
 
-async function main(address) {
+async function main(address, chain) {
 
     txObjList = [];
 
@@ -215,7 +226,7 @@ async function main(address) {
 
     x.forEach(function (url, index) {
         let p =
-            fetch('https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=' + x[index] + '&vs_currencies=usd');
+            fetch('https://api.coingecko.com/api/v3/simple/token_price/' + chain + '?contract_addresses=' + x[index] + '&vs_currencies=usd');
 
         promises.push(p);
 

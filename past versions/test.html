@@ -19,6 +19,8 @@
 
         url2 = 'https://api.etherscan.io/api?module=account&action=txlist&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ';
 
+        urlBSC = 'https://api.bscscan.com/api?module=account&action=tokentx&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=DEJRY487FBI9T81GH6Q4DN3RAM8C2WY7RB'
+
         normalTx = [];
         internalTx = [];
         hashList = [];
@@ -60,9 +62,18 @@
                 })
         }
 
+        function getBscTx() {
+            return fetch(urlBSC)
+                .then(response => {
+                    return response.json();
+                })
+                .then(res => {
+                    console.log(res.result);
+                })
+        }
+
         async function go() {
-            await getInternalTx();
-            await getNormalTx();
+            await getBscTx();
         }
 
         go();

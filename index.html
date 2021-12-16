@@ -17,12 +17,14 @@
 
     <div class="header">
         <h1>When Should You Have Held?</h1>
-        <p><small>Only applies to ERC20 token holdings*</small></p>
+        <p><small>Only applies to ERC20 and BEP20 token holdings*</small></p>
     </div>
 
     <div>
-        <input type="text" class="center-block-input" style="width: 60%" placeholder="Enter an ERC-20 wallet address">
-        <button class="center-block-btn" onClick="go()" spellcheck="false">Let's find out</button>
+        <input type="text" class="center-block-input" style="width: 60%"
+            placeholder="Enter an ERC-20 or BEP-20 wallet address">
+        <button class="center-block-btn" onClick="go('ethereum')" spellcheck="false">Calculate [ETH]</button>
+        <button class="center-block-btn" onClick="go('binance-smart-chain')" spellcheck="false">Calculate [BSC]</button>
     </div>
 
     <div>
@@ -53,9 +55,13 @@
 
         walletUrl = "";
 
-        async function go() {
+        async function go(chain) {
 
             reset();
+
+            if (chain == "binance-smart-chain") {
+                bsc = true
+            } else { bsc = false };
 
             var urlNode = document.querySelector(".center-block-input");
             var firstLineNode = document.querySelectorAll(".answer")[0];
@@ -70,7 +76,7 @@
             firstLineNode.innerHTML = "Calculating...";
 
             try {
-                await main(walletUrl);
+                await main(walletUrl, chain);
             } catch (err) {
                 firstLineNode.innerHTML = "<b>ERROR</b>";
                 firstLineNode.style.color = 'red';
