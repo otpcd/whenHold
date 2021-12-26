@@ -25,8 +25,7 @@
             placeholder="Enter an ERC-20 or BEP-20 wallet address">
         <button class="center-block-btn" onClick="go('ethereum')" spellcheck="false">Calculate [ETH]</button>
         <button class="center-block-btn" onClick="go('binance-smart-chain')" spellcheck="false">Calculate [BSC]</button>
-        <button class="center-block-btn" onClick="go('binance-smart-chain')" spellcheck="false">Calculate [AVAX C-Chain]
-            (soon)</button>
+        <button class="center-block-btn" onClick="go('avalanche')" spellcheck="false">Calculate [AVAX]</button>
     </div>
 
     <div>
@@ -62,8 +61,12 @@
             reset();
 
             if (chain == "binance-smart-chain") {
-                bsc = true
-            } else { bsc = false };
+                network = 'bsc'
+            } else if (chain == "avalanche") {
+                network = 'avax'
+            } else {
+                network = 'eth'
+            }
 
             var urlNode = document.querySelector(".center-block-input");
             var firstLineNode = document.querySelectorAll(".answer")[0];
@@ -114,7 +117,7 @@
 
             tableNode.innerHTML = createTable(finalTable);
 
-            reset();
+            //reset();
 
         }
 

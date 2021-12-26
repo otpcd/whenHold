@@ -16,7 +16,7 @@ coinAddresses = {};
 
 txObjList = [];
 
-bsc = false;
+network = '';
 
 class Tx {
     constructor(coinAddress, amount, timestamp, symbol) {
@@ -131,6 +131,7 @@ function calculatePortfolio(obj) {
             delete obj.coins[property];
         };
     }
+
     return total;
 }
 
@@ -165,13 +166,22 @@ function getEthPrice() {
 function getTokenTx(link) {
     let scanner = "";
     let apiKey = "";
-    if (bsc == false) {
-        scanner = "etherscan.io";
-        apiKey = "744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ"
-    } else {
-        scanner = "bscscan.com";
-        apiKey = "DEJRY487FBI9T81GH6Q4DN3RAM8C2WY7RB"
+
+    switch (network) {
+        case 'eth':
+            scanner = "etherscan.io";
+            apiKey = "744C6G2WQX78MHG8PXKRJ8D3G9KAXI6ARZ";
+            break;
+        case 'bsc':
+            scanner = "bscscan.com";
+            apiKey = "DEJRY487FBI9T81GH6Q4DN3RAM8C2WY7RB";
+            break;
+        case 'avax':
+            scanner = "snowtrace.io";
+            apiKey = "VE56HHXDNXA3Y684ZBZZ61HNKRW8BF4JP9";
+            break;
     }
+
     return fetch(`https://api.${scanner}/api?module=account&action=tokentx&address=${link}&sort=asc&apikey=${apiKey}`)
         .then(response => {
             return response.json();
@@ -205,6 +215,14 @@ function getTokenTx(link) {
 
             return res;
         })
+}
+
+function clean(obj) {
+    for (const property in obj) {
+        if (obj[property].usd == undefined) {
+            delete obj[property];
+        }
+    }
 }
 
 
@@ -244,6 +262,8 @@ async function main(address, chain) {
         })
         console.log("Promises complete");
     })
+
+    clean(coinprices);
 
     txObjList.forEach(function (url, index) {
         let p = txObjList[index];

@@ -21,6 +21,8 @@
 
         urlBSC = 'https://api.bscscan.com/api?module=account&action=tokentx&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=DEJRY487FBI9T81GH6Q4DN3RAM8C2WY7RB'
 
+        urlAVAX = 'https://api.snowtrace.io/api?module=account&action=tokentx&address=0x299a0fAF372A6b685a4e8339722f4a5fDC518724&sort=desc&apikey=VE56HHXDNXA3Y684ZBZZ61HNKRW8BF4JP9'
+
         normalTx = [];
         internalTx = [];
         hashList = [];
@@ -72,8 +74,18 @@
                 })
         }
 
+        function getAvaxTx() {
+            return fetch(urlAVAX)
+                .then(response => {
+                    return response.json();
+                })
+                .then(res => {
+                    console.log(res.result);
+                })
+        }
+
         async function go() {
-            await getBscTx();
+            await getAvaxTx();
         }
 
         go();
