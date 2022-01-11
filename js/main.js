@@ -143,6 +143,12 @@ function sortTable(arr) {
 }
 
 function calculatePortfolio(obj) {
+
+    /*
+        Calculates a portfolio object (either currentPorfolio or maxPortfolio)
+        using the prices obtained from the CoinGecko calls.
+    */
+
     total = 0;
     for (const property in obj.coins) {
         try {
