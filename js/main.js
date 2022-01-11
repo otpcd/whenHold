@@ -28,6 +28,12 @@ class Tx {
 }
 
 function reset() {
+
+    /*
+        To avoid any complications from residual variable values.
+        reset() is called at the beginning and end of the main function.
+    */
+
     maxPortfolio = {
         coins: {},
         timestamp: 0,
@@ -48,6 +54,11 @@ function reset() {
 }
 
 function createTable(arr) {
+
+    /*
+        Generates string of HTML to create final portfolio table
+    */
+
     var html = "<tr><td>" + "<b>COIN</b>" +
         "</td><td>" + "<b>HOLDINGS</b>" +
         "</td><td>" + "<b>CURRENT PRICE</b>" +
