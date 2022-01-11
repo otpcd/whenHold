@@ -112,6 +112,11 @@ function orderPortfolio(obj) {
 }
 
 function sortTable(arr) {
+
+    /*
+        Sorts the final portfolio table in descending order according to price
+    */
+
     arr.sort((a, b) => {
         var valueA = a.value;
         var valueB = b.value;
@@ -136,6 +141,12 @@ function calculatePortfolio(obj) {
 }
 
 function split10(obj) {
+
+    /* 
+        CoinGecko Price GET call is limited to 10 prices per call.
+        split10 takes all contract addresses and splits them into arrays of 10 strings each to be usable for multiple calls.
+    */
+
     let split = [];
     let result = [];
     for (const property in obj) {
@@ -150,17 +161,6 @@ function split10(obj) {
 
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function getEthPrice() {
-    return fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd')
-        .then(response => {
-            return response.json();
-        })
-        .then(res => {
-            coinprices['ethereum'] = { usd: res.ethereum.usd };
-            console.log(res);
-        })
 }
 
 function getTokenTx(link) {
