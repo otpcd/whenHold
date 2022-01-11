@@ -285,6 +285,8 @@ async function main(address, chain) {
         console.log("Promises complete");
     })
 
+
+    //clean() is necessary due to a rare bug where a CoinGecko price request returns an empty object.
     clean(coinprices);
 
     txObjList.forEach(function (url, index) {
