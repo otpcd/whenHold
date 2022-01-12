@@ -186,6 +186,11 @@ function numberWithCommas(x) {
 }
 
 function getTokenTx(link) {
+
+    /*
+        API calls to relevant chain API
+    */
+
     let scanner = "";
     let apiKey = "";
 
