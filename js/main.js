@@ -245,6 +245,11 @@ function getTokenTx(link) {
 }
 
 function clean(obj) {
+
+    /*
+        Cleans any price requests that return empty objects instead of .usd properties.
+    */
+
     for (const property in obj) {
         if (obj[property].usd == undefined) {
             delete obj[property];
