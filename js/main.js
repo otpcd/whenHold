@@ -13,6 +13,7 @@ maxPortfolio = {
 
     /*
         Portfolio with max value according to current prices.
+        Updated if currentPortfolio.value > maxPortfolio.value
     */
 
     coins: {},
