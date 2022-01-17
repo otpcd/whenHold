@@ -1,10 +1,20 @@
 currentPortfolio = {
+
+    /*
+        Rolling portfolio updated each transaction.
+    */
+
     coins: {},
     timestamp: 0,
     value: 0
 };
 
 maxPortfolio = {
+
+    /*
+        Portfolio with max value according to current prices.
+    */
+
     coins: {},
     timestamp: 0,
     value: 0
